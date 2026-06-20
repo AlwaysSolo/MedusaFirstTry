@@ -1,0 +1,12 @@
+node_modules
+.git
+.turbo
+.next
+.env*
+*.log
+apps/storefront/node_modules
+apps/storefront/.next
+apps/storefront/.turbo
+apps/backend/node_modules
+apps/backend/.medusa
+apps/backend/.turbo
