@@ -4,9 +4,5 @@
     "builder": "DOCKERFILE",
     "dockerfilePath": "apps/backend/Dockerfile",
     "context": "."
-  },
-  "deploy": {
-    "startCommand": "npx medusa start",
-    "numReplicas": 1
   }
 }

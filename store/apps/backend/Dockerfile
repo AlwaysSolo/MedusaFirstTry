@@ -1,4 +1,4 @@
-﻿FROM node:20-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ RUN npm ci
 COPY . .
 
 # Build the backend
-RUN npm run build --filter=@dtc/backend
+RUN npx turbo build --filter=@dtc/backend
 
 # Runner stage
 FROM node:20-alpine AS runner
