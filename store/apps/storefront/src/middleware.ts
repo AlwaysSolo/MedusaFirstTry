@@ -37,7 +37,8 @@ async function getRegionMap(cacheId: string) {
     })
 
     if (!response.ok) {
-      throw new Error(`Backend returned ${response.status}`)
+      console.warn(`Middleware.ts: Backend returned ${response.status} when fetching regions.`)
+      return new Map<string, HttpTypes.StoreRegion>()
     }
 
     const json = await response.json()
