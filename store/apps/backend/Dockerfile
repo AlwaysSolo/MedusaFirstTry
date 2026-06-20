@@ -2,32 +2,23 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# ── Key optimisation: skip the Medusa admin-dashboard Vite build ──
-# The admin UI is a heavy React/Vite bundle that can take 15+ minutes.
-# Set this to "true" so `medusa build` only compiles the server-side code.
+# ── Skip the Medusa admin dashboard Vite build (saves 10+ min) ──
 ENV DISABLE_MEDUSA_ADMIN=true
 
-# Copy workspace root files needed by npm ci
-COPY package.json package-lock.json ./
+# Copy ONLY the backend package.json — treat it as a standalone project,
+# completely bypassing the monorepo workspace and its 1 MB lockfile.
+# This means npm only resolves ~14 direct deps instead of the entire
+# monorepo (backend + storefront + devDeps of both).
+COPY apps/backend/package.json ./
 
-# Copy .npmrc if it exists (has auto-install-peers=true)
-COPY .npmrc ./
+# Install backend deps only.  Uses `npm install` (not `npm ci`) because
+# we intentionally skip the monorepo lockfile.
+RUN npm install --legacy-peer-deps
 
-# Copy workspace package.json files so npm can resolve the workspace graph.
-# The storefront package.json is needed for npm ci to succeed (workspace
-# references must resolve), but we never copy the storefront *source*.
-COPY apps/backend/package.json ./apps/backend/
-COPY apps/storefront/package.json ./apps/storefront/
+# Copy backend source, config, and tsconfig
+COPY apps/backend/ ./
 
-# Install dependencies
-RUN npm ci
-
-# Copy ONLY the backend source code – not the storefront
-COPY apps/backend/ ./apps/backend/
-
-# Build the backend (TypeScript compile + module discovery).
-# Because DISABLE_MEDUSA_ADMIN=true the admin dashboard is skipped.
-WORKDIR /app/apps/backend
+# Compile server-side TypeScript (admin build skipped via env var above)
 RUN npx medusa build
 
 EXPOSE 9000
