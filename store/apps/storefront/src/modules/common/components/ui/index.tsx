@@ -82,11 +82,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={clsx(
-          "inline-flex gap-2 items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-          variant === "primary" && "bg-black text-white hover:bg-gray-800",
-          variant === "secondary" &&
-            "bg-white text-black border border-gray-200 hover:bg-gray-50",
-          variant === "transparent" && "bg-transparent hover:bg-gray-100",
+          "inline-flex gap-2 items-center justify-center rounded-none font-mono font-bold transition-all disabled:pointer-events-none disabled:opacity-50 focus:outline-none border-2",
+          variant === "primary" && "bg-white text-black border-black hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_#ffb4a8] active:translate-x-0 active:translate-y-0 active:shadow-none",
+          variant === "secondary" && "bg-transparent text-white border-white hover:bg-white hover:text-black",
+          variant === "transparent" && "bg-transparent border-transparent hover:bg-neutral-800",
           size === "small" && "h-8 px-3 text-sm",
           size === "medium" && "h-10 px-4",
           size === "large" && "h-12 px-6 text-lg",
@@ -109,7 +108,7 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
     return (
       <div
         ref={ref}
-        className={clsx("bg-white rounded-lg p-4", className)}
+        className={clsx("bg-surface border-2 border-on-surface rounded-none p-4", className)}
         {...props}
       >
         {children}
@@ -214,18 +213,26 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, ...props }, ref) => {
+  ({ className, label, id, ...props }, ref) => {
     return (
-      <div className="flex flex-col gap-1">
-        {label && <Label>{label}</Label>}
+      <div className="relative mt-3">
         <input
           ref={ref}
+          id={id}
           className={clsx(
-            "flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+            "flex h-11 w-full rounded-none border-2 border-on-surface bg-surface text-on-surface px-4 py-3 text-sm placeholder:text-zinc-500 focus:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 font-mono transition-all",
             className
           )}
           {...props}
         />
+        {label && (
+          <label
+            htmlFor={id}
+            className="absolute left-3 -top-2.5 bg-surface px-1.5 text-xs font-mono font-bold text-on-surface border-x-2 border-on-surface"
+          >
+            {label}
+          </label>
+        )}
       </div>
     )
   }
@@ -408,18 +415,28 @@ type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & {
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   ({ className, label, id, ...props }, ref) => {
     return (
-      <div className="flex items-center gap-2">
-        <input
-          ref={ref}
-          type="checkbox"
-          id={id}
-          className={clsx(
-            "h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900",
-            className
-          )}
-          {...props}
-        />
-        {label && <Label htmlFor={id}>{label}</Label>}
+      <div className="flex items-center gap-3 cursor-pointer select-none">
+        <div className="relative">
+          <input
+            ref={ref}
+            type="checkbox"
+            id={id}
+            className="peer sr-only"
+            {...props}
+          />
+          <div
+            className="w-6 h-6 border-2 border-on-surface bg-surface transition-all flex items-center justify-center peer-checked:border-primary-container peer-checked:bg-primary-container peer-hover:border-primary-container"
+          >
+            <span className="hidden peer-checked:inline text-on-primary-container font-mono text-base font-black leading-none select-none">
+              X
+            </span>
+          </div>
+        </div>
+        {label && (
+          <Label htmlFor={id} className="cursor-pointer font-mono text-sm text-on-surface">
+            {label}
+          </Label>
+        )}
       </div>
     )
   }
